@@ -1,108 +1,735 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>SheerID Verification Hub</title>
-    <link href="https://fonts.googleapis.com" rel="stylesheet">
-    <style>
-        :root { --accent: #8b5cf6; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.08); }
-        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; background-image: radial-gradient(circle at 50% 0%, #1a1a1a, #050505); }
-        .main-card { width: 100%; max-width: 750px; background: var(--glass); backdrop-filter: blur(30px); border: 1px solid var(--border); border-radius: 24px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        h2 { font-family: 'JetBrains Mono'; font-size: 18px; letter-spacing: 2px; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
-        .section-title { font-size: 11px; text-transform: uppercase; color: #666; margin: 30px 0 15px 0; letter-spacing: 1px; font-weight: bold; }
-        
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        
-        .doc-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 11px; text-align: center; cursor: pointer; text-decoration: none; color: #fff; }
-        .doc-btn:hover { border-color: var(--accent); background: rgba(139, 92, 246, 0.1); }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SheerID Verification Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== TOKENS ===== */
+:root {
+  --bg:        #07080c;
+  --bg2:       #0d0f17;
+  --surface:   rgba(255,255,255,0.03);
+  --surface2:  rgba(255,255,255,0.065);
+  --border:    rgba(255,255,255,0.07);
+  --border-hi: rgba(255,255,255,0.18);
+  --text:      #e8eaf2;
+  --muted:     #525870;
+  --blue:      #4f8ef7;
+  --violet:    #9d6cf9;
+  --cyan:      #22d4c8;
+  --pink:      #f472b6;
+  --green:     #34d399;
+  --amber:     #fbbf24;
+  --mono:      'IBM Plex Mono', monospace;
+  --sans:      'Outfit', sans-serif;
+}
+.light {
+  --bg:       #edf0f7;
+  --bg2:      #e2e6f0;
+  --surface:  rgba(255,255,255,0.7);
+  --surface2: rgba(255,255,255,0.9);
+  --border:   rgba(0,0,0,0.09);
+  --border-hi:rgba(0,0,0,0.22);
+  --text:     #111827;
+  --muted:    #6b7280;
+}
 
-        .tool-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.3s; }
-        .tool-card:hover { border-color: var(--accent); transform: translateY(-3px); }
-        .tool-name { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-        .tool-desc { font-size: 10px; color: #888; line-height: 1.4; }
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .control-panel { margin-top: 30px; padding: 25px; background: #000; border: 1px solid var(--accent); border-radius: 16px; display: none; }
-        .bot-input { width: 100%; padding: 14px; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; margin-bottom: 15px; outline: none; font-family: 'JetBrains Mono'; }
-        .btn-run { width: 100%; padding: 14px; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-weight: 700; cursor: pointer; text-transform: uppercase; }
-        .terminal { margin-top: 20px; background: #080808; border-radius: 10px; padding: 15px; font-family: 'JetBrains Mono'; font-size: 11px; color: #00ff41; height: 200px; overflow-y: auto; line-height: 1.5; white-space: pre-wrap; }
-    </style>
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px 80px;
+  transition: background 0.4s, color 0.4s;
+  overflow-x: hidden;
+}
+
+/* ===== BACKGROUND ===== */
+.canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(130px);
+  opacity: 0.09;
+  animation: float 18s ease-in-out infinite alternate;
+}
+.o1 { width: 650px; height: 650px; background: var(--blue);   top: -220px; left: -180px; animation-delay: 0s; }
+.o2 { width: 480px; height: 480px; background: var(--violet); bottom:-160px; right:-100px; animation-delay: -7s; }
+.o3 { width: 280px; height: 280px; background: var(--cyan);   top: 38%; left: 55%; animation-delay: -12s; opacity: 0.05; }
+@keyframes float {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(50px,40px) scale(1.08); }
+}
+
+/* grid lines overlay */
+.grid-lines {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.light .grid-lines {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+}
+
+/* ===== WRAPPER ===== */
+.wrap {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 720px;
+}
+
+/* ===== THEME TOGGLE ===== */
+.theme-btn {
+  position: absolute;
+  top: 0; right: 0;
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+  user-select: none;
+  backdrop-filter: blur(20px);
+}
+.theme-btn:hover { border-color: var(--border-hi); transform: scale(1.08); }
+
+/* ===== COLOR PICKER ===== */
+.color-btn {
+  position: absolute;
+  top: 0; right: 48px;
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  transition: all 0.2s;
+  user-select: none;
+  backdrop-filter: blur(20px);
+}
+.color-btn:hover { border-color: var(--border-hi); transform: scale(1.08); }
+
+.color-panel {
+  position: absolute;
+  top: 48px; right: 48px;
+  background: rgba(10,12,22,0.92);
+  backdrop-filter: blur(40px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  display: none;
+  z-index: 100;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  animation: popIn 0.2s cubic-bezier(.22,1,.36,1) both;
+}
+.light .color-panel { background: rgba(240,244,255,0.95); }
+@keyframes popIn {
+  from { opacity:0; transform: scale(0.92) translateY(-6px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+.cp-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.cp-swatches {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.swatch {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.swatch:hover { transform: scale(1.12); }
+.swatch.active { border-color: #fff; }
+.light .swatch.active { border-color: #333; }
+.cp-divider { height: 1px; background: var(--border); margin: 10px 0; }
+.cp-custom {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 10px; color: var(--muted);
+}
+.cp-custom input[type=color] {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  background: none;
+  padding: 2px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: rgba(10,12,22,0.72);
+  backdrop-filter: blur(52px);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 44px 44px 36px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.025) inset,
+    0 40px 100px -20px rgba(0,0,0,0.75),
+    0 0 60px -20px rgba(79,142,247,0.07);
+  animation: slideUp 0.65s cubic-bezier(.22,1,.36,1) both;
+}
+.light .card {
+  background: rgba(240,244,255,0.8);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== HEADER ===== */
+.hd {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+.hd-icon {
+  width: 44px; height: 44px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--blue), var(--violet));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 14px; font-weight: 500;
+  color: #fff;
+  box-shadow: 0 0 24px rgba(157,108,249,0.35);
+  flex-shrink: 0;
+}
+.hd-info h1 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.hd-info p {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: 0.05em;
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  display: inline-block;
+  margin-right: 5px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ===== SECTION LABEL ===== */
+.sec-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 30px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sec-label::after { content:''; flex:1; height:1px; background: var(--border); }
+
+/* ===== DOC PILLS ===== */
+.doc-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.doc-pill {
+  padding: 7px 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex; align-items: center; gap: 4px;
+}
+.doc-pill:hover {
+  background: var(--surface2);
+  border-color: var(--border-hi);
+  transform: translateY(-2px);
+}
+
+/* ===== TOOL GRID ===== */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all 0.24s cubic-bezier(.22,1,.36,1);
+  position: relative;
+  overflow: hidden;
+}
+.tool-card::after {
+  content: '';
+  position: absolute;
+  inset: 0; opacity: 0;
+  transition: opacity 0.24s;
+  background: linear-gradient(135deg, rgba(79,142,247,0.06), rgba(157,108,249,0.04));
+}
+.tool-card:hover { border-color: var(--border-hi); transform: translateY(-4px); }
+.tool-card:hover::after { opacity: 1; }
+.tool-card.active { border-color: var(--violet); background: rgba(157,108,249,0.08); }
+.tool-card.active::after { opacity: 1; }
+
+.tc-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+.tc-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.tc-desc { font-size: 10.5px; color: var(--muted); line-height: 1.45; }
+
+/* ===== METHOD CARDS ===== */
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.m-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.m-card:hover { border-color: var(--border-hi); transform: translateY(-3px); }
+.m-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.m-desc { font-size: 10.5px; color: var(--muted); }
+.badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.b-tool   { background: rgba(52,211,153,0.12); color: var(--green); }
+.b-web    { background: rgba(79,142,247,0.12);  color: var(--blue); }
+.b-bot    { background: rgba(244,114,182,0.12); color: var(--pink); }
+.b-browser{ background: rgba(251,191,36,0.12);  color: var(--amber); }
+
+/* ===== LAUNCH PANEL ===== */
+.launch-panel {
+  margin-top: 24px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: none;
+  animation: slideUp 0.4s cubic-bezier(.22,1,.36,1) both;
+}
+.light .launch-panel { background: rgba(255,255,255,0.5); }
+.launch-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.launch-title span {
+  color: var(--violet);
+  font-weight: 500;
+}
+.url-input {
+  width: 100%;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.light .url-input { background: rgba(255,255,255,0.6); }
+.url-input:focus { border-color: var(--violet); }
+.url-input::placeholder { color: var(--muted); }
+.launch-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--blue), var(--violet));
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 4px 20px rgba(157,108,249,0.25);
+}
+.launch-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.launch-btn:active { transform: translateY(0); }
+
+/* ===== TERMINAL ===== */
+.terminal {
+  margin-top: 16px;
+  background: #000;
+  border: 1px solid rgba(34,212,200,0.2);
+  border-radius: 12px;
+  padding: 16px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: #22d4c8;
+  height: 200px;
+  overflow-y: auto;
+  display: none;
+  line-height: 1.7;
+  animation: slideUp 0.3s ease both;
+}
+.terminal .line { display: block; }
+.terminal .err  { color: #f87171; }
+.terminal .ok   { color: var(--green); }
+.terminal .dim  { color: #444; }
+
+/* scrollbar */
+.terminal::-webkit-scrollbar { width: 4px; }
+.terminal::-webkit-scrollbar-thumb { background: rgba(34,212,200,0.2); border-radius: 2px; }
+
+/* progress bar */
+.progress-wrap { margin-top: 12px; display: none; }
+.progress-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  border-radius: 2px;
+  width: 0%;
+  animation: prog 3s ease forwards;
+}
+@keyframes prog { to { width: 88%; } }
+
+/* ===== FOOTER ===== */
+.footer {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+}
+.footer a {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 0.18s;
+}
+.footer a:hover { color: var(--text); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 560px) {
+  .card { padding: 28px 20px; }
+  .tool-grid, .method-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 400px) {
+  .tool-grid, .method-grid { grid-template-columns: 1fr; }
+}
+</style>
 </head>
-<body>
+<body id="body">
 
-<div class="main-card">
-    <h2>SHEERID VERIFICATION</h2>
+<div class="canvas">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+<div class="grid-lines"></div>
+
+<div class="wrap">
+
+  <!-- Theme Toggle -->
+  <div class="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌓</div>
+
+  <!-- Color Picker Button -->
+  <div class="color-btn" onclick="toggleColorPanel(event)" title="Fon rangi">🎨</div>
+
+  <!-- Color Panel -->
+  <div class="color-panel" id="colorPanel">
+    <div class="cp-label">Fon rangi</div>
+    <div class="cp-swatches" id="swatches">
+      <div class="swatch active" style="background:#07080c" onclick="setBg(this,'#07080c')"></div>
+      <div class="swatch" style="background:#0a0f1e" onclick="setBg(this,'#0a0f1e')"></div>
+      <div class="swatch" style="background:#0d0a1a" onclick="setBg(this,'#0d0a1a')"></div>
+      <div class="swatch" style="background:#0a1a0f" onclick="setBg(this,'#0a1a0f')"></div>
+      <div class="swatch" style="background:#1a0a0a" onclick="setBg(this,'#1a0a0a')"></div>
+      <div class="swatch" style="background:#0f1117" onclick="setBg(this,'#0f1117')"></div>
+      <div class="swatch" style="background:#1e1b4b" onclick="setBg(this,'#1e1b4b')"></div>
+      <div class="swatch" style="background:#0c1a2e" onclick="setBg(this,'#0c1a2e')"></div>
+      <div class="swatch" style="background:#14532d" onclick="setBg(this,'#14532d')"></div>
+      <div class="swatch" style="background:#3b0764" onclick="setBg(this,'#3b0764')"></div>
+    </div>
+    <div class="cp-divider"></div>
+    <div class="cp-custom">
+      <input type="color" id="customColor" value="#07080c" oninput="setCustomBg(this.value)">
+      <span>O'zingiz tanlang</span>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+
+    <!-- Header -->
+    <div class="hd">
+      <div class="hd-icon">S/</div>
+      <div class="hd-info">
+        <h1>SheerID Verification</h1>
+        <p><span class="status-dot"></span>Hub · Documentation &amp; Tools</p>
+      </div>
+    </div>
 
     <!-- Documentation -->
-    <div class="section-title">📖 Documentation</div>
-    <div class="grid-5">
-        <a href="#" class="doc-btn">🇺🇸 EN</a> <a href="#" class="doc-btn">🇻🇳 VI</a> <a href="#" class="doc-btn">🇨🇳 中文</a> <a href="#" class="doc-btn">🇯🇵 JP</a> <a href="#" class="doc-btn">🇰🇷 KR</a>
+    <div class="sec-label">📖 Documentation</div>
+    <div class="doc-row">
+      <a class="doc-pill" href="#">🇺🇸 EN</a>
+      <a class="doc-pill" href="#">🇻🇳 VI</a>
+      <a class="doc-pill" href="#">🇨🇳 中文</a>
+      <a class="doc-pill" href="#">🇯🇵 JP</a>
+      <a class="doc-pill" href="#">🇰🇷 KO</a>
+      <a class="doc-pill" href="#">🇷🇺 RU</a>
+      <a class="doc-pill" href="#">🇪🇸 ES</a>
+      <a class="doc-pill" href="#">🇫🇷 FR</a>
+      <a class="doc-pill" href="#">🇩🇪 DE</a>
+      <a class="doc-pill" href="#">🇮🇹 IT</a>
+      <a class="doc-pill" href="#">🇹🇷 TR</a>
+      <a class="doc-pill" href="#">🇵🇱 PL</a>
+      <a class="doc-pill" href="#">🇮🇩 ID</a>
+      <a class="doc-pill" href="#">🇧🇷 PT</a>
+      <a class="doc-pill" href="#">🇹🇭 TH</a>
+      <a class="doc-pill" href="#">🇮🇳 HI</a>
+      <a class="doc-pill" href="#">🇸🇦 AR</a>
     </div>
 
     <!-- Tool Guides -->
-    <div class="section-title">🛠️ Tool Guides</div>
-    <div class="grid-3">
-        <div class="tool-card" onclick="selectTool('spotify', 'Spotify')"><div class="tool-name">🎵 Spotify</div><div class="tool-desc">Student verification.</div></div>
-        <div class="tool-card" onclick="selectTool('youtube', 'YouTube')"><div class="tool-name">🎬 YouTube</div><div class="tool-desc">Auto-activation.</div></div>
-        <div class="tool-card" onclick="selectTool('gemini', 'Gemini')"><div class="tool-name">🤖 Gemini</div><div class="tool-desc">AI Premium.</div></div>
-        <div class="tool-card" onclick="selectTool('bolt', 'Bolt.new')"><div class="tool-name">⚡ Bolt.new</div><div class="tool-desc">Teacher bot.</div></div>
-        <div class="tool-card" onclick="selectTool('k12', 'K12')"><div class="tool-name">🏫 K12</div><div class="tool-desc">ChatGPT Plus.</div></div>
-        <div class="tool-card" onclick="selectTool('veterans', 'Veterans')"><div class="tool-name">🎖️ Veterans</div><div class="tool-desc">Military flow.</div></div>
+    <div class="sec-label">🛠️ Tool Guides</div>
+    <div class="tool-grid">
+      <div class="tool-card" onclick="selectTool(this,'spotify','Spotify')">
+        <span class="tc-icon">🎵</span>
+        <div class="tc-name">Spotify</div>
+        <div class="tc-desc">Student verification management</div>
+      </div>
+      <div class="tool-card" onclick="selectTool(this,'youtube','YouTube')">
+        <span class="tc-icon">🎬</span>
+        <div class="tc-name">YouTube</div>
+        <div class="tc-desc">Proxy &amp; account status check</div>
+      </div>
+      <div class="tool-card" onclick="selectTool(this,'gemini','Gemini')">
+        <span class="tc-icon">🤖</span>
+        <div class="tc-name">Gemini</div>
+        <div class="tc-desc">AI Premium student flow</div>
+      </div>
+      <div class="tool-card" onclick="selectTool(this,'bolt','Bolt.new')">
+        <span class="tc-icon">⚡</span>
+        <div class="tc-name">Bolt.new</div>
+        <div class="tc-desc">Automated teacher verification</div>
+      </div>
+      <div class="tool-card" onclick="selectTool(this,'k12','K12')">
+        <span class="tc-icon">🏫</span>
+        <div class="tc-name">K12</div>
+        <div class="tc-desc">K12 verification module</div>
+      </div>
+      <div class="tool-card" onclick="selectTool(this,'veterans','Veterans')">
+        <span class="tc-icon">🎖️</span>
+        <div class="tc-name">Veterans</div>
+        <div class="tc-desc">Military status automated</div>
+      </div>
     </div>
 
     <!-- Other Methods -->
-    <div class="section-title">🔗 Other Methods</div>
-    <div class="grid-3">
-        <div class="tool-card" onclick="window.open('https://roxybrowser.com')"><div class="tool-name">🦊 RoxyBrowser</div><div class="tool-desc">Anti-detect browser.</div></div>
-        <div class="tool-card" onclick="window.open('https://ip123.in')"><div class="tool-name">🌐 Check IP</div><div class="tool-desc">Check proxy status.</div></div>
-        <div class="tool-card" onclick="window.location.href='/api/generate-proof?name=Shahzod&surname=Qalandarov'"><div class="tool-name">📋 TOL</div><div class="tool-desc">Create Teacher PNG.</div></div>
+    <div class="sec-label">🔗 Other Methods</div>
+    <div class="method-grid">
+      <div class="m-card">
+        <div class="m-name">🦊 RoxyBrowser <span class="badge b-browser">Browser</span></div>
+        <div class="m-desc">Anti-detect fingerprint browser</div>
+      </div>
+      <div class="m-card">
+        <div class="m-name">🌐 Check IP <span class="badge b-web">Web</span></div>
+        <div class="m-desc">Proxy &amp; geolocation data</div>
+      </div>
+      <div class="m-card">
+        <div class="m-name">🤖 SheerID Bot <span class="badge b-bot">Bot</span></div>
+        <div class="m-desc">Telegram verification bot</div>
+      </div>
+      <div class="m-card">
+        <div class="m-name">🤖 GPT Bot <span class="badge b-bot">Bot</span></div>
+        <div class="m-desc">Automated verification bot</div>
+      </div>
+      <div class="m-card">
+        <div class="m-name">🎓 Student Card <span class="badge b-tool">Tool</span></div>
+        <div class="m-desc">Generate student card for manual verification</div>
+      </div>
+      <div class="m-card">
+        <div class="m-name">💰 Payslip <span class="badge b-tool">Tool</span></div>
+        <div class="m-desc">Generate payslip documents</div>
+      </div>
     </div>
 
-    <!-- Bot Paneli -->
-    <div id="control-panel" class="control-panel">
-        <div style="font-size: 12px; margin-bottom: 10px; color: var(--accent);" id="active-tool-label">> INITIALIZING BOT</div>
-        <input type="text" id="sheerid-url" class="bot-input" placeholder="Paste SheerID Link here...">
-        <button class="btn-run" id="run-btn" onclick="startVerification()">Launch Verification</button>
-        <div id="terminal" class="terminal" style="display:none;"></div>
+    <!-- Launch Panel -->
+    <div class="launch-panel" id="panel">
+      <div class="launch-title">Selected tool: <span id="tool-label">—</span></div>
+      <input class="url-input" id="url-in" type="text" placeholder="Paste SheerID link here…">
+      <button class="launch-btn" onclick="run()">▶ Launch Process</button>
+      <div class="progress-wrap" id="prog-wrap"><div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div></div>
+      <div class="terminal" id="term"></div>
     </div>
-</div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <a href="#">GitHub</a>
+      <a href="#">Donate</a>
+      <a href="#">Support</a>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /wrap -->
 
 <script>
-    let activeTool = '';
+  let current = '', activeCard = null;
 
-    function selectTool(id, name) {
-        activeTool = id;
-        document.getElementById('control-panel').style.display = 'block';
-        document.getElementById('active-tool-label').innerText = `> EXECUTING ${name.toUpperCase()} FLOW`;
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  function toggleTheme() {
+    document.getElementById('body').classList.toggle('light');
+  }
+
+  function toggleColorPanel(e) {
+    e.stopPropagation();
+    const p = document.getElementById('colorPanel');
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  }
+
+  document.addEventListener('click', () => {
+    const p = document.getElementById('colorPanel');
+    if (p) p.style.display = 'none';
+  });
+
+  function setBg(el, color) {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    document.documentElement.style.setProperty('--bg', color);
+    document.body.style.background = color;
+    document.getElementById('customColor').value = color;
+  }
+
+  function setCustomBg(color) {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    document.documentElement.style.setProperty('--bg', color);
+    document.body.style.background = color;
+  }
+
+  function selectTool(el, id, name) {
+    if (activeCard) activeCard.classList.remove('active');
+    el.classList.add('active');
+    activeCard = el;
+    current = id;
+    document.getElementById('tool-label').textContent = name;
+    const panel = document.getElementById('panel');
+    panel.style.display = 'block';
+    // reset
+    document.getElementById('term').style.display = 'none';
+    document.getElementById('prog-wrap').style.display = 'none';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  const FAKE_LOGS = [
+    ['dim', '>> Initializing environment…'],
+    ['line', '>> Connecting to SheerID endpoint…'],
+    ['line', '>> Resolving proxy chain…'],
+    ['ok',  '✓ Proxy validated — clean exit node'],
+    ['line', '>> Loading verification module for {tool}…'],
+    ['ok',  '✓ Module loaded successfully'],
+    ['line', '>> Preparing request headers…'],
+    ['line', '>> Submitting form data…'],
+    ['ok',  '✓ Response received — status 200'],
+    ['line', '>> Parsing verification token…'],
+    ['ok',  '✓ Token extracted'],
+    ['line', '>> Finalizing session…'],
+    ['ok',  '✓✓ VERIFICATION COMPLETE'],
+  ];
+
+  async function run() {
+    if (!current) return;
+    const url = document.getElementById('url-in').value.trim();
+    if (!url) { document.getElementById('url-in').focus(); return; }
+
+    const term = document.getElementById('term');
+    const progWrap = document.getElementById('prog-wrap');
+    const progFill = document.getElementById('prog-fill');
+
+    term.innerHTML = '';
+    term.style.display = 'block';
+    progWrap.style.display = 'block';
+    progFill.style.animation = 'none';
+    void progFill.offsetWidth; // reflow
+    progFill.style.animation = 'prog 3s ease forwards';
+
+    for (const [cls, msg] of FAKE_LOGS) {
+      await delay(Math.random() * 280 + 120);
+      const span = document.createElement('span');
+      span.className = 'line ' + cls;
+      span.textContent = msg.replace('{tool}', current) + '\n';
+      term.appendChild(span);
+      term.scrollTop = term.scrollHeight;
     }
+  }
 
-    async function startVerification() {
-        const url = document.getElementById('sheerid-url').value;
-        const term = document.getElementById('terminal');
-        const btn = document.getElementById('run-btn');
-        if(!url) return alert("Link kiriting!");
-
-        term.style.display = 'block';
-        term.innerText = `>> Connecting to ${activeTool}...\n`;
-        btn.disabled = true;
-
-        const response = await fetch('/run-bot', {
-            method: 'POST',
-            body: new URLSearchParams({'tool_type': activeTool, 'sheerid_url': url})
-        });
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        while (true) {
-            const {done, value} = await reader.read();
-            if (done) break;
-            term.innerText += decoder.decode(value).replace("data: ", "");
-            term.scrollTop = term.scrollHeight;
-        }
-        btn.disabled = false;
-    }
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
