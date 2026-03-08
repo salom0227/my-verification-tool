@@ -1,54 +1,48 @@
 import os
-import sys
-from pathlib import Path
-from fastapi import FastAPI, Request, Form, BackgroundTasks
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
-import uvicorn
+import random
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from canva_teacher_tool.main import generate_employment_letter, DEFAULT_UK_SCHOOLS, TEACHING_POSITIONS, generate_name
 
-# Barcha tool-lar joylashgan papkalarni Python yo'liga qo'shamiz
-BASE_PATH = Path(__file__).parent
-sys.path.insert(0, str(BASE_PATH / "spotify-verify-tool"))
-sys.path.insert(0, str(BASE_PATH / "canva-teacher-tool"))
+app = FastAPI(title="SheerID Verification Tool")
 
-# Tool-larni import qilishga urinib ko'ramiz
-try:
-    from spotify_verify_tool.main import run_spotify_verify
-except ImportError:
-    def run_spotify_verify(url): print(f"[*] Spotify Bot Simulyatsiyasi: {url}")
+@app.get("/")
+def home():
+    return {
+        "status": "Online", 
+        "message": "SheerID Verification API is running",
+        "endpoints": {
+            "generate_canva": "/generate/canva?name=Ali&surname=Vali"
+        }
+    }
 
-try:
-    # Canva tool ichidagi asosiy funksiya nomini tekshiring (odatda main.py da)
-    from canva_teacher_tool.main import run_canva_verify 
-except ImportError:
-    def run_canva_verify(url): print(f"[*] Canva Bot Simulyatsiyasi: {url}")
-
-app = FastAPI()
-templates = Jinja2Templates(directory=".")
-
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    # Bu sizning yangilangan index.html faylingizni ochadi
-    return templates.TemplateResponse("index.html", {"request": request})
-
-@app.post("/run")
-async def start_bot(background_tasks: BackgroundTasks, sheerid_url: str = Form(...), tool_type: str = Form(...)):
-    # Linkni tekshirish
-    if "services.sheerid.com" not in sheerid_url:
-        return JSONResponse(content={"status": "error", "message": "Noto'g'ri SheerID linki!"}, status_code=400)
+@app.get("/generate/canva")
+def make_canva_doc(name: str = None, surname: str = None):
+    # Agar ism kiritilmasa, tasodifiy tanlaydi
+    if not name or not surname:
+        name, surname = generate_name()
+        
+    school = random.choice(DEFAULT_UK_SCHOOLS)
+    position = random.choice(TEACHING_POSITIONS)
     
-    # Tanlangan servisga qarab botni ishga tushirish
-    if tool_type == "spotify":
-        background_tasks.add_task(run_spotify_verify, sheerid_url)
-        display_name = "Spotify Student"
-    elif tool_type == "canva":
-        background_tasks.add_task(run_canva_verify, sheerid_url)
-        display_name = "Canva Education (Teacher)"
-    else:
-        return JSONResponse(content={"status": "error", "message": "Noma'lum servis tanlandi!"}, status_code=400)
-    
-    return JSONResponse(content={"status": "success", "message": f"{display_name} boti ishga tushdi! Railway loglarini kuzating."})
+    try:
+        # Hujjatni yaratish
+        file_path = generate_employment_letter(name, surname, school, position)
+        
+        if "Error" in file_path:
+            raise HTTPException(status_code=500, detail=file_path)
+            
+        # Faylni foydalanuvchiga yuborish
+        return FileResponse(
+            path=file_path, 
+            filename=f"Canva_Proof_{name}_{surname}.png",
+            media_type="image/png"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
+    import uvicorn
+    # Railway taqdim etadigan PORT orqali ishga tushadi
+    port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

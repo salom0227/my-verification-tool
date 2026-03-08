@@ -6,3 +6,4 @@ httpx
 Pillow
 curl_cffi
 cloudscraper
+pymupdf

@@ -1,7 +1,7 @@
 # 1. Python tasvirini tanlaymiz
 FROM python:3.10-slim
 
-# 2. Tizim kutubxonalarini o'rnatamiz (Pillow, curl_cffi va shriftlar uchun)
+# 2. Tizim kutubxonalarini o'rnatamiz
 RUN apt-get update && apt-get install -y \
     build-essential \
     libffi-dev \
@@ -16,12 +16,12 @@ WORKDIR /app
 # 4. Kutubxonalarni o'rnatamiz
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-# FastAPI va Web-server uchun qo'shimcha kutubxonalar
-RUN pip install --no-cache-dir fastapi uvicorn jinja2 python-multipart curl_cffi cloudscraper pillow httpx
 
 # 5. Loyihaning barcha fayllarini nusxalaymiz
 COPY . .
 
-# 6. Railway portini aniqlaymiz va Web-serverni ishga tushiramiz
-# app.py - bu biz yaratgan yangi Frontend+Backend birlashtiruvchi fayl
+# 6. Output papkasini yaratib qo'yamiz (rasmlar uchun)
+RUN mkdir -p canva-teacher-tool/output
+
+# 7. Railway portini aniqlaymiz va Web-serverni ishga tushiramiz
 CMD ["python", "app.py"]
