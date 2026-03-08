@@ -1,4 +1,8 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
 httpx
 Pillow
-requests
+curl_cffi
 cloudscraper
