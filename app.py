@@ -398,13 +398,12 @@ class _delete_file_after:
 if __name__ == "__main__":
     import uvicorn
 
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8080))
     debug = os.environ.get("DEBUG", "false").lower() == "true"
 
     uvicorn.run(
-        "server:app",          # modul:app — hot-reload uchun string ishlatiladi
+        app,                   # to'g'ridan-to'g'ri app obyekti — "python app.py" bilan ishlaydi
         host="0.0.0.0",
         port=port,
-        reload=debug,
         log_level="debug" if debug else "info",
     )
