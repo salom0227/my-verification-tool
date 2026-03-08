@@ -1,108 +1,211 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>SheerID Universal Dashboard</title>
+  <title>SheerID Universal Bot | Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com" rel="stylesheet">
   <style>
     :root {
       --bg-dark: #050505;
-      --glass-bg: rgba(20, 20, 20, 0.6);
+      --glass-bg: rgba(20, 20, 20, 0.7);
       --glass-border: rgba(255, 255, 255, 0.08);
       --primary: #3b82f6;
       --accent: #8b5cf6;
+      --success: #10b981;
+      --error: #ef4444;
       --text-main: #ffffff;
       --text-muted: #888888;
       --font-sans: 'Inter', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
-    * { box-sizing: border-box; }
+
+    * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--primary) transparent; }
+    
     body {
       font-family: var(--font-sans);
       background-color: var(--bg-dark);
       color: var(--text-main);
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
-      padding: 40px 0;
-      background-image: radial-gradient(circle at 50% 0%, #1a1a1a, #050505);
       min-height: 100vh;
       margin: 0;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at 50% 0%, #1a1a1a, #050505);
     }
-    .glow-orb { position: fixed; width: 600px; height: 600px; border-radius: 50%; filter: blur(100px); opacity: 0.15; z-index: -1; }
-    .orb-1 { top: -200px; left: -100px; background: var(--primary); }
-    .orb-2 { bottom: -200px; right: -100px; background: var(--accent); }
-    .container { width: 100%; max-width: 720px; padding: 24px; z-index: 1; }
-    .glass-card { background: var(--glass-bg); backdrop-filter: blur(40px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 48px; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5); }
-    h2 { margin: 0 0 32px 0; font-size: 20px; font-weight: 600; font-family: var(--font-mono); color: #fff; display: flex; align-items: center; gap: 12px; }
-    h2::before { content: ''; display: block; width: 20px; height: 20px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 6px; }
-    .section-title { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); margin: 32px 0 16px 0; text-transform: uppercase; letter-spacing: 0.1em; }
-    .bot-panel { margin-top: 20px; padding: 24px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 16px; }
-    .bot-input { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(0, 0, 0, 0.4); color: #fff; font-family: var(--font-mono); font-size: 14px; margin-bottom: 12px; outline: none; transition: 0.3s; }
-    .bot-input:focus { border-color: var(--primary); }
-    select.bot-input { cursor: pointer; appearance: none; }
-    .bot-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; font-weight: 700; font-family: var(--font-sans); cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
-    .bot-btn:hover { transform: translateY(-2px); opacity: 0.9; }
-    .bot-btn:disabled { background: #333; cursor: not-allowed; }
-    #status { margin-top: 15px; font-size: 13px; font-family: var(--font-mono); text-align: center; }
+
+    /* README uslubidagi Neon Glow orblari */
+    .glow-orb { position: fixed; width: 600px; height: 600px; border-radius: 50%; filter: blur(120px); opacity: 0.12; z-index: -1; pointer-events: none; }
+    .orb-1 { top: -250px; left: -150px; background: var(--primary); }
+    .orb-2 { bottom: -250px; right: -150px; background: var(--accent); }
+
+    .container { width: 100%; max-width: 800px; padding: 20px; z-index: 1; }
+
+    .glass-card { 
+      background: var(--glass-bg); 
+      backdrop-filter: blur(40px); 
+      border: 1px solid var(--glass-border); 
+      border-radius: 28px; 
+      padding: 40px; 
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Header qismi */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+    h2 { 
+      margin: 0; font-size: 22px; font-weight: 700; font-family: var(--font-mono); 
+      background: linear-gradient(to right, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .status-badge { 
+      font-size: 11px; padding: 4px 10px; border-radius: 20px; background: rgba(16, 185, 129, 0.1); 
+      color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); font-family: var(--font-mono);
+    }
+
+    .section-title { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin: 25px 0 12px 0; text-transform: uppercase; letter-spacing: 0.15em; }
+
+    /* Form elementlari */
+    .bot-panel { padding: 24px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 18px; }
+    .bot-input { 
+      width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border); 
+      background: rgba(0, 0, 0, 0.5); color: #fff; font-family: var(--font-sans); font-size: 14px; margin-bottom: 15px; outline: none; transition: 0.3s;
+    }
+    .bot-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(59, 130, 246, 0.15); }
+    
+    select.bot-input { cursor: pointer; color: var(--primary); font-weight: 600; }
+
+    .bot-btn { 
+      width: 100%; padding: 16px; border-radius: 12px; border: none; 
+      background: linear-gradient(135deg, var(--primary), var(--accent)); 
+      color: white; font-weight: 700; font-family: var(--font-sans); cursor: pointer; transition: 0.4s; 
+      text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.4);
+    }
+    .bot-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 25px -8px rgba(59, 130, 246, 0.6); }
+    .bot-btn:active { transform: translateY(-1px); }
+    .bot-btn:disabled { background: #222; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.5; }
+
+    /* Professional Terminal Dizayni */
+    .terminal-container { 
+      margin-top: 30px; background: #000; border: 1px solid #333; border-radius: 14px; 
+      overflow: hidden; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+    .terminal-header { 
+      background: #111; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #222;
+    }
+    .terminal-dots { display: flex; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f56; } .dot-y { background: #ffbd2e; } .dot-g { background: #27c93f; }
+    .terminal-title { font-family: var(--font-mono); font-size: 11px; color: #666; }
+    
+    .terminal-body { 
+      padding: 20px; font-family: var(--font-mono); font-size: 13px; color: #00ff41; 
+      max-height: 350px; overflow-y: auto; line-height: 1.6; white-space: pre-wrap;
+      text-shadow: 0 0 5px rgba(0, 255, 65, 0.2);
+    }
+
+    #status-text { margin-top: 20px; font-size: 13px; font-family: var(--font-mono); text-align: center; color: var(--text-muted); }
   </style>
 </head>
 <body>
   <div class="glow-orb orb-1"></div>
   <div class="glow-orb orb-2"></div>
+
   <div class="container">
     <div class="glass-card">
-      <h2>SHEERID UNIVERSAL BOT</h2>
-      <div class="section-title">🚀 Control Center</div>
+      <div class="header">
+        <h2>SHEERID COMMAND CENTER</h2>
+        <div class="status-badge">● SYSTEM ONLINE</div>
+      </div>
+
       <div class="bot-panel">
         <form id="verifyForm">
-          <label class="section-title" style="margin-top:0; display:block; margin-bottom:8px;">Select Service</label>
+          <label class="section-title">Select Target Service</label>
           <select id="tool_type" name="tool_type" class="bot-input">
             <option value="spotify">🎵 Spotify Premium (Student)</option>
-            <option value="canva">👨‍🏫 Canva Education (Teacher)</option>
+            <option value="youtube">🎬 YouTube Premium (Student)</option>
+            <option value="canva">🎨 Canva Education (Teacher)</option>
+            <option value="gemini">🤖 Google One Gemini Advanced</option>
+            <option value="chatgpt">🏫 ChatGPT Plus (K12 Teacher)</option>
           </select>
-          <label class="section-title" style="display:block; margin-bottom:8px;">SheerID URL</label>
-          <input type="text" id="url" name="sheerid_url" class="bot-input" placeholder="Paste SheerID link here..." required>
-          <button type="submit" id="submitBtn" class="bot-btn">Launch Verification</button>
+
+          <label class="section-title">Verification Link (SheerID URL)</label>
+          <input type="text" id="url" name="sheerid_url" class="bot-input" placeholder="https://verify.sheerid.com..." required>
+          
+          <button type="submit" id="submitBtn" class="bot-btn">Execute Verification Flow</button>
         </form>
-        <div id="status"></div>
+
+        <div id="status-text">Ready for operation...</div>
+
+        <!-- Terminal Oynasi -->
+        <div id="terminal" class="terminal-container">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+            </div>
+            <div class="terminal-title">system_logs --v1.0</div>
+            <div style="width: 42px;"></div>
+          </div>
+          <div id="log-content" class="terminal-body"></div>
+        </div>
       </div>
     </div>
   </div>
+
   <script>
     const form = document.getElementById('verifyForm');
     const btn = document.getElementById('submitBtn');
-    const status = document.getElementById('status');
+    const status = document.getElementById('status-text');
+    const terminal = document.getElementById('terminal');
+    const logContent = document.getElementById('log-content');
+
     form.onsubmit = async (e) => {
       e.preventDefault();
-      const urlValue = document.getElementById('url').value;
-      const toolValue = document.getElementById('tool_type').value;
+      
+      const formData = new FormData(form);
+      const toolName = document.getElementById('tool_type').value.toUpperCase();
+
+      // UI Yangilash
       btn.disabled = true;
-      btn.innerText = 'Initializing...';
-      status.innerText = '⏳ Processing request, check Railway logs...';
-      status.style.color = '#3b82f6';
-      const formData = new FormData();
-      formData.append('sheerid_url', urlValue);
-      formData.append('tool_type', toolValue);
+      status.innerText = `⏳ Initializing ${toolName} verification...`;
+      terminal.style.display = 'block';
+      logContent.innerHTML = `<span style="color: #fff">>> [SYSTEM] Starting process for ${toolName}...</span>\n`;
+      
       try {
-        const response = await fetch('/run', { method: 'POST', body: formData });
-        const result = await response.json();
-        if (result.status === 'success') {
-          status.innerText = '✅ ' + result.message;
-          status.style.color = '#4ade80';
-        } else {
-          status.innerText = '❌ Error: ' + result.message;
-          status.style.color = '#f87171';
+        const response = await fetch('/run', {
+          method: 'POST',
+          body: formData
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value);
+          logContent.innerText += chunk;
+          
+          // Avtomatik eng pastga tushirish
+          logContent.scrollTop = logContent.scrollHeight;
+          
+          if (chunk.includes("✅")) status.style.color = "#10b981";
+          if (chunk.includes("❌")) status.style.color = "#ef4444";
         }
+
+        status.innerText = "Operation completed.";
+        
       } catch (err) {
-        status.innerText = '❌ Connection failed!';
-        status.style.color = '#f87171';
+        logContent.innerHTML += `\n<span style="color: #ef4444">>> [FATAL ERROR] Connection to backend lost.</span>`;
+        status.innerText = "Connection failed!";
       } finally {
         btn.disabled = false;
-        btn.innerText = 'Launch Verification';
       }
     };
   </script>
