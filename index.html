@@ -1,188 +1,214 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>SheerID Universal | Cyber Dashboard</title>
-    <link href="https://fonts.googleapis.com" rel="stylesheet">
-    <style>
-        :root {
-            --neon-blue: #00f3ff;
-            --neon-purple: #bc13fe;
-            --bg-black: #080808;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.1);
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>SheerID Universal Hub | Controls</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #050505;
+      --glass-bg: rgba(20, 20, 20, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --primary: #3b82f6;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --error: #ef4444;
+      --text-main: #ffffff;
+      --text-muted: #888888;
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
 
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%;
-            background: var(--bg-black); font-family: 'Space Grotesk', sans-serif;
-            color: #fff; overflow-x: hidden;
-        }
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      padding: 40px 0;
+      background-image: radial-gradient(circle at 50% 0%, #1a1a1a, #050505);
+      min-height: 100vh;
+      margin: 0;
+    }
 
-        /* ORQA FON ANIMATSIYASI */
-        #canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.3; }
+    .glow-orb { position: fixed; width: 600px; height: 600px; border-radius: 50%; filter: blur(120px); opacity: 0.15; z-index: -1; }
+    .orb-1 { top: -200px; left: -100px; background: var(--primary); }
+    .orb-2 { bottom: -200px; right: -100px; background: var(--accent); }
 
-        .container { 
-            max-width: 900px; margin: 50px auto; padding: 20px;
-            backdrop-filter: blur(10px);
-        }
+    .container { width: 100%; max-width: 850px; padding: 24px; z-index: 1; }
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(40px);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
 
-        .glass-card {
-            background: var(--glass); border: 1px solid var(--border);
-            border-radius: 24px; padding: 40px;
-            box-shadow: 0 0 50px rgba(0, 243, 255, 0.1);
-            position: relative; overflow: hidden;
-        }
+    h2 { margin: 0 0 32px 0; font-size: 22px; font-weight: 700; font-family: var(--font-mono); color: #fff; display: flex; align-items: center; gap: 12px; text-transform: uppercase; letter-spacing: 2px; }
+    h2::before { content: ''; display: block; width: 24px; height: 24px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 6px; box-shadow: 0 0 15px var(--primary); }
 
-        h1 { 
-            font-size: 32px; letter-spacing: 4px; text-transform: uppercase;
-            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 40px; text-align: center;
-        }
+    .section-title { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin: 32px 0 16px 0; text-transform: uppercase; letter-spacing: 0.2em; border-left: 2px solid var(--primary); padding-left: 10px; }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    /* Metod kartalari (Siz kutgan dizayn) */
+    .method-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 30px; }
+    .method-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      text-align: left;
+    }
+    .method-card:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 20px -10px var(--primary); }
+    .method-card.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
 
-        .panel { 
-            background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border);
-            border-radius: 16px; padding: 25px; transition: 0.3s;
-        }
-        .panel:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); }
+    .method-icon { font-size: 28px; margin-bottom: 12px; }
+    .method-name { font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 6px; }
+    .method-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .method-tag { position: absolute; top: 15px; right: 15px; font-size: 9px; padding: 4px 8px; border-radius: 6px; font-family: var(--font-mono); text-transform: uppercase; font-weight: bold; }
+    
+    .tag-student { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    .tag-teacher { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
 
-        .input-group { margin-bottom: 20px; }
-        label { display: block; font-family: 'JetBrains Mono'; font-size: 10px; color: #888; margin-bottom: 8px; text-transform: uppercase; }
-        
-        input, select {
-            width: 100%; background: #111; border: 1px solid #333;
-            padding: 12px; border-radius: 8px; color: #fff; outline: none;
-            font-family: 'JetBrains Mono'; transition: 0.3s;
-        }
-        input:focus { border-color: var(--neon-blue); }
+    /* Ishchi panel */
+    .control-panel { margin-top: 30px; padding: 30px; background: rgba(0,0,0,0.3); border-radius: 20px; border: 1px solid var(--glass-border); display: none; }
+    .bot-input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border); background: #000; color: #fff; font-family: var(--font-mono); font-size: 14px; margin-bottom: 20px; outline: none; }
+    .bot-input:focus { border-color: var(--primary); }
+    
+    .btn-execute { width: 100%; padding: 18px; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+    .btn-execute:hover { opacity: 0.9; transform: scale(1.01); }
 
-        .btn {
-            width: 100%; padding: 15px; border-radius: 8px; border: none;
-            cursor: pointer; font-weight: bold; text-transform: uppercase;
-            font-family: 'Space Grotesk'; transition: 0.3s;
-            color: #fff; letter-spacing: 2px;
-        }
-        .btn-blue { background: linear-gradient(135deg, var(--neon-blue), #0077ff); }
-        .btn-green { background: linear-gradient(135deg, #00ff88, #00bd68); margin-top: 10px; }
-        .btn:hover { transform: scale(1.02); filter: brightness(1.2); }
+    /* Terminal */
+    .terminal { margin-top: 30px; background: #000; border: 1px solid #222; border-radius: 16px; padding: 20px; font-family: var(--font-mono); font-size: 12px; color: #00ff41; height: 300px; overflow-y: auto; display: none; box-shadow: inset 0 0 20px rgba(0,255,0,0.05); }
 
-        /* TERMINAL STILI */
-        .terminal {
-            margin-top: 30px; background: #000; border: 1px solid #222;
-            border-radius: 12px; font-family: 'JetBrains Mono'; font-size: 12px;
-            color: #00ff41; height: 300px; overflow-y: auto; padding: 20px;
-            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.05); display: none;
-        }
-    </style>
+    @media (max-width: 600px) { .method-cards { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
-    <canvas id="canvas"></canvas>
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
 
-    <div class="container">
-        <div class="glass-card">
-            <h1>SheerID Command Center</h1>
+  <div class="container">
+    <div class="glass-card">
+      <h2>SHEERID HUB <span id="sys-status" style="font-size: 10px; margin-left: auto; color: var(--success);">● ONLINE</span></h2>
 
-            <div class="grid">
-                <!-- BOT BOSHQARUV -->
-                <div class="panel">
-                    <label>⚙️ Auto-Verification Bot</label>
-                    <form id="botForm">
-                        <div class="input-group">
-                            <label>Service</label>
-                            <select name="tool_type" id="tool_type">
-                                <option value="spotify">Spotify Premium</option>
-                                <option value="canva">Canva Education</option>
-                                <option value="youtube">YouTube Premium</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label>SheerID URL</label>
-                            <input type="text" name="sheerid_url" placeholder="https://verify.sheerid.com..." required>
-                        </div>
-                        <button type="submit" class="btn btn-blue" id="botBtn">Execute Flow</button>
-                    </form>
-                </div>
-
-                <!-- DOC GENERATOR -->
-                <div class="panel">
-                    <label>📄 Proof Generator</label>
-                    <div class="input-group">
-                        <label>First Name</label>
-                        <input type="text" id="fname" placeholder="Shahzod">
-                    </div>
-                    <div class="input-group">
-                        <label>Last Name</label>
-                        <input type="text" id="lname" placeholder="Qalandarov">
-                    </div>
-                    <button onclick="generateDoc()" class="btn btn-green">Generate & Download</button>
-                </div>
-            </div>
-
-            <div id="terminal" class="terminal"></div>
+      <div class="section-title">🚀 Select Verification Target</div>
+      <div class="method-cards">
+        <!-- Spotify -->
+        <div class="method-card" onclick="selectTool('spotify', '🎵 Spotify Premium', 'student')">
+          <div class="method-tag tag-student">STUDENT</div>
+          <div class="method-icon">🎵</div>
+          <div class="method-name">Spotify Student</div>
+          <div class="method-desc">Automated university verification workflow.</div>
         </div>
+
+        <!-- YouTube -->
+        <div class="method-card" onclick="selectTool('youtube', '🎬 YouTube Premium', 'student')">
+          <div class="method-tag tag-student">STUDENT</div>
+          <div class="method-icon">🎬</div>
+          <div class="method-name">YouTube Premium</div>
+          <div class="method-desc">Global student discount auto-activation.</div>
+        </div>
+
+        <!-- Canva -->
+        <div class="method-card" onclick="selectTool('canva', '🎨 Canva Education', 'teacher')">
+          <div class="method-tag tag-teacher">TEACHER</div>
+          <div class="method-icon">🎨</div>
+          <div class="method-name">Canva Pro/Edu</div>
+          <div class="method-desc">Generate UK Teacher documents & Auto-Verify.</div>
+        </div>
+
+        <!-- Gemini / Google One -->
+        <div class="method-card" onclick="selectTool('gemini', '🤖 Gemini Advanced', 'student')">
+          <div class="method-tag tag-student">STUDENT</div>
+          <div class="method-icon">🤖</div>
+          <div class="method-name">Gemini Advanced</div>
+          <div class="method-desc">Activate Google One AI Premium for students.</div>
+        </div>
+      </div>
+
+      <!-- Control Center -->
+      <div id="controlPanel" class="control-panel">
+        <div class="section-title" id="selectedToolTitle">Execution Center</div>
+        <form id="execForm">
+          <input type="hidden" name="tool_type" id="toolTypeInput">
+          
+          <label class="section-title" style="margin-top:0">SheerID Verification Link</label>
+          <input type="text" name="sheerid_url" id="sheeridUrl" class="bot-input" placeholder="Paste verify.sheerid.com link here..." required>
+          
+          <!-- Faqat Canva bo'lsa chiqadigan Generator qismi -->
+          <div id="canvaExtra" style="display:none; margin-bottom: 20px;">
+            <label class="section-title">Manual Proof Generator (Optional)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="fname" class="bot-input" placeholder="Name" style="margin-bottom:0">
+                <input type="text" id="lname" class="bot-input" placeholder="Surname" style="margin-bottom:0">
+            </div>
+            <button type="button" onclick="generateManual()" class="btn-execute" style="background: #111; border: 1px solid var(--success); color: var(--success); margin-top: 10px; font-size: 11px; padding: 10px;">📥 Download PNG Proof</button>
+          </div>
+
+          <button type="submit" id="execBtn" class="btn-execute">Launch Workflow</button>
+        </form>
+      </div>
+
+      <div id="terminal" class="terminal"></div>
     </div>
+  </div>
 
-    <script>
-        // --- ANIMATSIYA (Matrix Background) ---
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+  <script>
+    let currentTool = '';
 
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
-        const fontSize = 16;
-        const columns = canvas.width / fontSize;
-        const drops = Array(Math.floor(columns)).fill(1);
+    function selectTool(type, name, role) {
+      currentTool = type;
+      document.getElementById('controlPanel').style.display = 'block';
+      document.getElementById('toolTypeInput').value = type;
+      document.getElementById('selectedToolTitle').innerText = `⚡ ${name.toUpperCase()} CONTROL`;
+      
+      // Canva bo'lsa qo'shimcha generatorni ochish
+      document.getElementById('canvaExtra').style.display = (type === 'canva') ? 'block' : 'none';
+      
+      // Kartalarni aktiv qilish
+      document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
 
-        function draw() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#0F0";
-            ctx.font = fontSize + "px JetBrains Mono";
-            for (let i = 0; i < drops.length; i++) {
-                const text = letters[Math.floor(Math.random() * letters.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
-            }
-        }
-        setInterval(draw, 33);
+    async function generateManual() {
+        const fn = document.getElementById('fname').value;
+        const ln = document.getElementById('lname').value;
+        if(!fn || !ln) return alert("Enter Name & Surname!");
+        window.location.href = `/api/generate-proof?name=${fn}&surname=${ln}`;
+    }
 
-        // --- BOT FLOW (Streaming) ---
-        document.getElementById('botForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('botBtn');
-            const term = document.getElementById('terminal');
-            term.style.display = 'block';
-            term.innerHTML = ">> [BOOT] System check... OK\n";
-            btn.disabled = true;
+    document.getElementById('execForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('execBtn');
+      const term = document.getElementById('terminal');
+      term.style.display = 'block';
+      term.innerHTML = `>> [BOOT] Initializing ${currentTool.toUpperCase()} sequence...\n`;
+      btn.disabled = true;
 
-            const formData = new FormData(e.target);
-            const response = await fetch('/run-bot', { method: 'POST', body: formData });
-            
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
+      const formData = new FormData(e.target);
+      const response = await fetch('/run-bot', { method: 'POST', body: formData });
+      
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
 
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                term.innerText += decoder.decode(value).replace("data: ", "");
-                term.scrollTop = term.scrollHeight;
-            }
-            btn.disabled = false;
-        };
-
-        // --- GENERATOR FLOW ---
-        function generateDoc() {
-            const n = document.getElementById('fname').value;
-            const s = document.getElementById('lname').value;
-            if(!n || !s) return alert("Ism va familiyani kiriting!");
-            window.location.href = `/api/generate-proof?name=${n}&surname=${s}`;
-        }
-    </script>
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        term.innerText += decoder.decode(value).replace("data: ", "");
+        term.scrollTop = term.scrollHeight;
+      }
+      btn.disabled = false;
+    };
+  </script>
 </body>
 </html>
