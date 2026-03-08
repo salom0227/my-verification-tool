@@ -3,220 +3,91 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>SheerID Universal Dashboard</title>
+    <title>SheerID Verification Hub</title>
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #0d0d15;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --accent: #8b5cf6;
-            --text-muted: #94a3b8;
-        }
+        :root { --accent: #8b5cf6; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.08); }
+        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; background-image: radial-gradient(circle at 50% 0%, #1a1a1a, #050505); }
+        .main-card { width: 100%; max-width: 750px; background: var(--glass); backdrop-filter: blur(30px); border: 1px solid var(--border); border-radius: 24px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        h2 { font-family: 'JetBrains Mono'; font-size: 18px; letter-spacing: 2px; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .section-title { font-size: 11px; text-transform: uppercase; color: #666; margin: 30px 0 15px 0; letter-spacing: 1px; font-weight: bold; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        
+        .doc-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 11px; text-align: center; cursor: pointer; text-decoration: none; color: #fff; }
+        .doc-btn:hover { border-color: var(--accent); background: rgba(139, 92, 246, 0.1); }
 
-        body {
-            margin: 0; padding: 40px 20px;
-            background: var(--bg-color);
-            background-image: radial-gradient(circle at 50% -20%, #1e1b4b, #0d0d15);
-            font-family: 'Inter', sans-serif;
-            color: #fff;
-            display: flex; justify-content: center;
-            min-height: 100vh;
-        }
+        .tool-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.3s; }
+        .tool-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .tool-name { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .tool-desc { font-size: 10px; color: #888; line-height: 1.4; }
 
-        .container { width: 100%; max-width: 700px; }
-
-        .main-card {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
-        .header-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 10px; }
-        .header h1 { font-size: 20px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
-
-        .section-header { 
-            display: flex; align-items: center; gap: 10px;
-            font-size: 14px; font-weight: 600; color: #fff;
-            margin: 25px 0 15px 0; opacity: 0.9;
-        }
-
-        /* Documentation Grid (Bayroqlar) */
-        .docs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .doc-item {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            font-size: 12px; text-decoration: none; color: #fff; transition: 0.2s;
-        }
-        .doc-item:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); }
-
-        /* Tool Guides Grid (3 ustunli) */
-        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .tool-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-            position: relative;
-        }
-        .tool-card:hover { border-color: var(--accent); background: rgba(139, 92, 246, 0.05); transform: translateY(-3px); }
-        .tool-card.active { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
-
-        .tool-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-        .tool-icon { font-size: 16px; }
-        .tool-name { font-size: 14px; font-weight: 600; }
-        .tool-desc { font-size: 10px; color: var(--text-muted); line-height: 1.3; }
-
-        /* Bot Control Panel (Tugmani bosganda chiqadi) */
-        #control-center {
-            margin-top: 25px; padding: 20px;
-            background: rgba(0,0,0,0.4); border: 1px solid var(--accent);
-            border-radius: 16px; display: none; animation: fadeIn 0.4s;
-        }
-        .bot-input {
-            width: 100%; padding: 12px; background: #000; border: 1px solid var(--border);
-            border-radius: 8px; color: #fff; margin-bottom: 15px; outline: none; font-family: 'JetBrains Mono';
-        }
-        .btn-run {
-            width: 100%; padding: 12px; background: var(--accent); border: none;
-            border-radius: 8px; color: #fff; font-weight: 700; cursor: pointer;
-        }
-
-        .terminal {
-            margin-top: 20px; background: #000; border-radius: 10px;
-            padding: 15px; font-family: 'JetBrains Mono'; font-size: 11px;
-            color: #22c55e; height: 150px; overflow-y: auto; display: none;
-        }
-
-        .footer { 
-            display: flex; justify-content: center; gap: 20px; 
-            margin-top: 30px; font-size: 11px; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 600px) { .tools-grid, .docs-grid { grid-template-columns: repeat(2, 1fr); } }
+        .control-panel { margin-top: 30px; padding: 25px; background: #000; border: 1px solid var(--accent); border-radius: 16px; display: none; }
+        .bot-input { width: 100%; padding: 14px; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; margin-bottom: 15px; outline: none; font-family: 'JetBrains Mono'; }
+        .btn-run { width: 100%; padding: 14px; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        .terminal { margin-top: 20px; background: #080808; border-radius: 10px; padding: 15px; font-family: 'JetBrains Mono'; font-size: 11px; color: #00ff41; height: 200px; overflow-y: auto; line-height: 1.5; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="main-card">
-        <div class="header">
-            <div class="header-icon"></div>
-            <h1>SHEERID VERIFICATION</h1>
-        </div>
+<div class="main-card">
+    <h2>SHEERID VERIFICATION</h2>
 
-        <!-- Documentation -->
-        <div class="section-header">📖 Documentation</div>
-        <div class="docs-grid">
-            <a href="#" class="doc-item">🇺🇸 EN</a>
-            <a href="#" class="doc-item">🇻🇳 VI</a>
-            <a href="#" class="doc-item">🇨🇳 中文</a>
-            <a href="#" class="doc-item">🇯🇵 日本語</a>
-            <a href="#" class="doc-item">🇰🇷 한국어</a>
-            <a href="#" class="doc-item">🇪🇸 ES</a>
-            <a href="#" class="doc-item">🇫🇷 FR</a>
-            <a href="#" class="doc-item">🇩🇪 DE</a>
-            <a href="#" class="doc-item">🇷🇺 RU</a>
-            <a href="#" class="doc-item">🇵🇹 PT</a>
-        </div>
+    <!-- Documentation -->
+    <div class="section-title">📖 Documentation</div>
+    <div class="grid-5">
+        <a href="#" class="doc-btn">🇺🇸 EN</a> <a href="#" class="doc-btn">🇻🇳 VI</a> <a href="#" class="doc-btn">🇨🇳 中文</a> <a href="#" class="doc-btn">🇯🇵 JP</a> <a href="#" class="doc-btn">🇰🇷 KR</a>
+    </div>
 
-        <!-- Tool Guides -->
-        <div class="section-header">🛠️ Tool Guides</div>
-        <div class="tools-grid">
-            <div class="tool-card" onclick="openBot('spotify', 'Spotify')">
-                <div class="tool-top">🎵 <span class="tool-name">Spotify</span></div>
-                <div class="tool-desc">Anti-detect browser for multi-account management.</div>
-            </div>
-            <div class="tool-card" onclick="openBot('youtube', 'YouTube')">
-                <div class="tool-top">▶️ <span class="tool-name">YouTube</span></div>
-                <div class="tool-desc">Check your IP address and proxy status.</div>
-            </div>
-            <div class="tool-card" onclick="openBot('gemini', 'Gemini')">
-                <div class="tool-top">🤖 <span class="tool-name">Gemini</span></div>
-                <div class="tool-desc">AI Premium student verification automated.</div>
-            </div>
-            <div class="tool-card" onclick="openBot('bolt', 'Bolt.new')">
-                <div class="tool-top">⚡ <span class="tool-name">Bolt.new</span></div>
-                <div class="tool-desc">Automated Telegram verification module.</div>
-            </div>
-            <div class="tool-card" onclick="openBot('k12', 'K12')">
-                <div class="tool-top">🏫 <span class="tool-name">K12</span></div>
-                <div class="tool-desc">Automated school verification bot.</div>
-            </div>
-            <div class="tool-card" onclick="openBot('veterans', 'Veterans')">
-                <div class="tool-top">🎖️ <span class="tool-name">Veterans</span></div>
-                <div class="tool-desc">Automated military status verification.</div>
-            </div>
-        </div>
+    <!-- Tool Guides -->
+    <div class="section-title">🛠️ Tool Guides</div>
+    <div class="grid-3">
+        <div class="tool-card" onclick="selectTool('spotify', 'Spotify')"><div class="tool-name">🎵 Spotify</div><div class="tool-desc">Student verification.</div></div>
+        <div class="tool-card" onclick="selectTool('youtube', 'YouTube')"><div class="tool-name">🎬 YouTube</div><div class="tool-desc">Auto-activation.</div></div>
+        <div class="tool-card" onclick="selectTool('gemini', 'Gemini')"><div class="tool-name">🤖 Gemini</div><div class="tool-desc">AI Premium.</div></div>
+        <div class="tool-card" onclick="selectTool('bolt', 'Bolt.new')"><div class="tool-name">⚡ Bolt.new</div><div class="tool-desc">Teacher bot.</div></div>
+        <div class="tool-card" onclick="selectTool('k12', 'K12')"><div class="tool-name">🏫 K12</div><div class="tool-desc">ChatGPT Plus.</div></div>
+        <div class="tool-card" onclick="selectTool('veterans', 'Veterans')"><div class="tool-name">🎖️ Veterans</div><div class="tool-desc">Military flow.</div></div>
+    </div>
 
-        <!-- Other Methods -->
-        <div class="section-header">🔗 Other Methods</div>
-        <div class="tools-grid">
-            <div class="tool-card">
-                <div class="tool-top">🦊 <span class="tool-name">RoxyBrowser</span></div>
-                <div class="tool-desc">Advanced anti-detect fingerprints.</div>
-            </div>
-            <div class="tool-card">
-                <div class="tool-top">🌐 <span class="tool-name">Check IP</span></div>
-                <div class="tool-desc">Check proxy and geolocation data.</div>
-            </div>
-            <div class="tool-card">
-                <div class="tool-top">🤖 <span class="tool-name">GPT Bot</span></div>
-                <div class="tool-desc">Automated GPT-4 Plus verification.</div>
-            </div>
-            <div class="tool-card" onclick="location.href='/generate/canva?name=Shahzod&surname=Qalandarov'">
-                <div class="tool-top">📋 <span class="tool-name">TOL</span></div>
-                <div class="tool-desc">Create payslip and teacher docs.</div>
-            </div>
-        </div>
+    <!-- Other Methods -->
+    <div class="section-title">🔗 Other Methods</div>
+    <div class="grid-3">
+        <div class="tool-card" onclick="window.open('https://roxybrowser.com')"><div class="tool-name">🦊 RoxyBrowser</div><div class="tool-desc">Anti-detect browser.</div></div>
+        <div class="tool-card" onclick="window.open('https://ip123.in')"><div class="tool-name">🌐 Check IP</div><div class="tool-desc">Check proxy status.</div></div>
+        <div class="tool-card" onclick="window.location.href='/api/generate-proof?name=Shahzod&surname=Qalandarov'"><div class="tool-name">📋 TOL</div><div class="tool-desc">Create Teacher PNG.</div></div>
+    </div>
 
-        <!-- Control Center -->
-        <div id="control-center">
-            <h3 id="target-name" style="font-size: 14px; margin: 0 0 15px 0; color: var(--accent);">EXECUTE BOT</h3>
-            <input type="text" id="sheerid-url" class="bot-input" placeholder="Paste SheerID Link here...">
-            <button class="btn-run" id="run-btn" onclick="runBot()">Launch Verification</button>
-            <div id="logs" class="terminal"></div>
-        </div>
-
-        <div class="footer">
-            <span>GITHUB</span> <span>DONATE</span> <span>SUPPORT</span>
-        </div>
+    <!-- Bot Paneli -->
+    <div id="control-panel" class="control-panel">
+        <div style="font-size: 12px; margin-bottom: 10px; color: var(--accent);" id="active-tool-label">> INITIALIZING BOT</div>
+        <input type="text" id="sheerid-url" class="bot-input" placeholder="Paste SheerID Link here...">
+        <button class="btn-run" id="run-btn" onclick="startVerification()">Launch Verification</button>
+        <div id="terminal" class="terminal" style="display:none;"></div>
     </div>
 </div>
 
 <script>
     let activeTool = '';
 
-    function openBot(id, name) {
+    function selectTool(id, name) {
         activeTool = id;
-        document.getElementById('control-center').style.display = 'block';
-        document.getElementById('target-name').innerText = `EXECUTE ${name.toUpperCase()} BOT`;
-        document.querySelectorAll('.tool-card').forEach(c => c.classList.remove('active'));
+        document.getElementById('control-panel').style.display = 'block';
+        document.getElementById('active-tool-label').innerText = `> EXECUTING ${name.toUpperCase()} FLOW`;
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
-    async function runBot() {
+    async function startVerification() {
         const url = document.getElementById('sheerid-url').value;
-        if(!url) return alert("Linkni kiriting!");
-        
-        const logs = document.getElementById('logs');
+        const term = document.getElementById('terminal');
         const btn = document.getElementById('run-btn');
-        logs.style.display = 'block';
-        logs.innerText = `>> Initiating ${activeTool} flow...\n`;
+        if(!url) return alert("Link kiriting!");
+
+        term.style.display = 'block';
+        term.innerText = `>> Connecting to ${activeTool}...\n`;
         btn.disabled = true;
 
-        // Backend bilan bog'lanish (Stream)
         const response = await fetch('/run-bot', {
             method: 'POST',
             body: new URLSearchParams({'tool_type': activeTool, 'sheerid_url': url})
@@ -227,12 +98,11 @@
         while (true) {
             const {done, value} = await reader.read();
             if (done) break;
-            logs.innerText += decoder.decode(value).replace("data: ", "");
-            logs.scrollTop = logs.scrollHeight;
+            term.innerText += decoder.decode(value).replace("data: ", "");
+            term.scrollTop = term.scrollHeight;
         }
         btn.disabled = false;
     }
 </script>
-
 </body>
 </html>
